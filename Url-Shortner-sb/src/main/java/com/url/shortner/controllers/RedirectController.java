@@ -25,13 +25,9 @@ public class RedirectController {
      */
     @GetMapping("/{shortUrl}")
     public ResponseEntity<Void> redirect(@PathVariable @NotBlank(message = "Short URL cannot be blank") String shortUrl) {
-        UrlMapping urlMapping = urlMappingService.getOriginalUrl(shortUrl);
-        if (urlMapping != null) {
+        String originalUrl = urlMappingService.getOriginalUrl(shortUrl);
+        if (originalUrl != null) {
             HttpHeaders httpHeaders = new HttpHeaders();
-
-            // Ensure no double slash
-            String originalUrl = urlMapping.getOriginalUrl();
-
             httpHeaders.add("Location", originalUrl);
             return ResponseEntity.status(302).headers(httpHeaders).build();
         } else {

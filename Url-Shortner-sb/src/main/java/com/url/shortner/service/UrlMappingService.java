@@ -2,7 +2,9 @@ package com.url.shortner.service;
 
 import com.url.shortner.dtos.ClickEventDTO;
 import com.url.shortner.dtos.UrlMappingDTO;
+import com.url.shortner.dtos.UrlRedirectCache;
 import com.url.shortner.exceptions.DuplicateAliasException;
+import com.url.shortner.exceptions.UrlExpiredException;
 import com.url.shortner.models.ClickEvent;
 import com.url.shortner.models.UrlMapping;
 import com.url.shortner.models.User;
@@ -10,11 +12,13 @@ import com.url.shortner.repository.ClickEventRepository;
 import com.url.shortner.repository.UrlMappingRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,6 +40,15 @@ public class UrlMappingService {
 
     @Autowired
     private ClickEventRepository clickEventRepository;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired
+    private ClickAnalyticsService clickAnalyticsService;
+
+    @Value("${REDIS_DEFAULT_TTL_DAYS:7}")
+    private long defaultTtlDays;
 
     private Clock clock = Clock.systemUTC();
 
@@ -97,19 +110,6 @@ public class UrlMappingService {
         }
     }
 
-    // Generate a random 8-character alphanumeric string
-    private String generateShortUrl1() {
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-        Random random = new Random();
-        StringBuilder shortUrl = new StringBuilder(8);
-
-        for(int i = 0;i < 8 ; i++){
-            shortUrl.append(characters.charAt(random.nextInt(characters.length())));
-        }
-        return shortUrl.toString();
-    }
-
     private String generateShortUrl() {
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         Random random = new Random();
@@ -125,7 +125,6 @@ public class UrlMappingService {
 
         return shortUrl;
     }
-
 
     // Convert UrlMapping entity to UrlMappingDTO
     private UrlMappingDTO convertToDto(UrlMapping urlMapping){
@@ -171,28 +170,75 @@ public class UrlMappingService {
         return clickEvents.stream().collect(Collectors.groupingBy(click -> click.getClickDate().toLocalDate(), Collectors.counting()));
     }
 
-    // Retrieve original URL and increment click count
-    public UrlMapping getOriginalUrl(String shortUrl) {
-        UrlMapping urlMapping = urlMappingRepository.findByShortUrl(shortUrl);
-        if(urlMapping != null){
-            if (isExpired(urlMapping)) {
-                throw new com.url.shortner.exceptions.UrlExpiredException("The short URL has expired.");
-            }
+    // Retrieve original URL (via Redis or DB) and asynchronously record click
+    public String getOriginalUrl(String shortUrl) {
+        String cacheKey = "url:" + shortUrl;
+        UrlRedirectCache cacheValue = null;
 
-            urlMapping.setClickCount(urlMapping.getClickCount() + 1);
-            urlMappingRepository.save(urlMapping);
-
-            // record Click event
-
-            ClickEvent clickEvent =  new ClickEvent();
-            clickEvent.setClickDate(LocalDateTime.now(clock));
-            clickEvent.setUrlMapping(urlMapping);
-            clickEventRepository.save(clickEvent);
+        // Redis GET with graceful degradation
+        try {
+            cacheValue = (UrlRedirectCache) redisTemplate.opsForValue().get(cacheKey);
+        } catch (Exception e) {
+            System.err.println("Redis GET failed for key " + cacheKey + ": " + e.getMessage());
         }
-        return urlMapping;
+
+        if (cacheValue != null) {
+            // Cache HIT
+            if (isExpiredCache(cacheValue)) {
+                evictCache(cacheKey);
+                throw new UrlExpiredException("The short URL has expired.");
+            }
+            // Fire-and-forget async analytics
+            clickAnalyticsService.recordClick(cacheValue.getId(), LocalDateTime.now(clock));
+            return cacheValue.getOriginalUrl();
+        }
+
+        // Cache MISS - PostgreSQL fallback
+        UrlMapping urlMapping = urlMappingRepository.findByShortUrl(shortUrl);
+        if (urlMapping != null) {
+            if (isExpired(urlMapping)) {
+                throw new UrlExpiredException("The short URL has expired.");
+            }
+            populateCache(cacheKey, urlMapping);
+            
+            // Fire-and-forget async analytics
+            clickAnalyticsService.recordClick(urlMapping.getId(), LocalDateTime.now(clock));
+            return urlMapping.getOriginalUrl();
+        }
+
+        return null; // Triggers 404 in controller
     }
 
-    // Check if the URL has expired
+    private void populateCache(String cacheKey, UrlMapping urlMapping) {
+        UrlRedirectCache dto = new UrlRedirectCache(
+                urlMapping.getId(),
+                urlMapping.getShortUrl(),
+                urlMapping.getOriginalUrl(),
+                urlMapping.getExpiresAt()
+        );
+
+        Duration ttl = (urlMapping.getExpiresAt() != null)
+                ? Duration.between(LocalDateTime.now(clock), urlMapping.getExpiresAt())
+                : Duration.ofDays(defaultTtlDays);
+
+        if (ttl.isNegative() || ttl.isZero()) return;
+
+        try {
+            redisTemplate.opsForValue().set(cacheKey, dto, ttl);
+        } catch (Exception e) {
+            System.err.println("Redis SET failed for key " + cacheKey + ": " + e.getMessage());
+        }
+    }
+
+    private void evictCache(String cacheKey) {
+        try {
+            redisTemplate.delete(cacheKey);
+        } catch (Exception e) {
+            System.err.println("Redis DELETE failed for key " + cacheKey + ". Stale cache risk exists. Exception: " + e.getMessage());
+        }
+    }
+
+    // Check if the URL mapping entity has expired
     public boolean isExpired(UrlMapping urlMapping) {
         if (urlMapping.getExpiresAt() == null) {
             return false;
@@ -200,8 +246,16 @@ public class UrlMappingService {
         return urlMapping.getExpiresAt().isBefore(LocalDateTime.now(clock));
     }
 
+    // Check if the cached DTO has expired
+    private boolean isExpiredCache(UrlRedirectCache cacheValue) {
+        if (cacheValue.getExpiresAt() == null) {
+            return false;
+        }
+        return cacheValue.getExpiresAt().isBefore(LocalDateTime.now(clock));
+    }
+
     // Delete URL mapping along with its click events
-    @Transactional  // Ensure all deletions happen in a single transaction
+    @Transactional
     public void deleteUrlMapping(String shortUrl, User user) {
         UrlMapping urlMapping = urlMappingRepository.findByShortUrl(shortUrl);
 
@@ -218,9 +272,13 @@ public class UrlMappingService {
 
         // Delete the URL mapping itself
         urlMappingRepository.delete(urlMapping);
+
+        // Cache Invalidation
+        evictCache("url:" + shortUrl);
     }
 
     // Update the original URL for a given short URL
+    @Transactional
     public UrlMappingDTO updateOriginalUrl(String shortUrl, String newOriginalUrl, User user) {
         UrlMapping urlMapping = urlMappingRepository.findByShortUrl(shortUrl);
 
@@ -234,6 +292,10 @@ public class UrlMappingService {
 
         urlMapping.setOriginalUrl(newOriginalUrl);
         urlMappingRepository.save(urlMapping);
+
+        // Cache Invalidation
+        evictCache("url:" + shortUrl);
+
         return convertToDto(urlMapping);
     }
 }

@@ -22,7 +22,7 @@ LinkForge provides a complete solution for link management. Beyond just shorteni
   * **✅ Shorten Links:** Instantly generate concise, shareable short URLs for any long link.
   * **🏷️ Custom URL Aliases:** Optionally create your own custom vanity URL aliases (e.g. `linkforge.com/s/my-brand`).
   * **⏳ Link Expiration:** Set an optional expiration date for temporary links. Expired links safely return a `410 Gone` while preserving historical click analytics.
-  * **📈 Analytics Dashboard:** Access a powerful dashboard to track the performance of every link, showing the total number of clicks.
+  * **📈 Async Analytics:** A high-throughput, non-blocking click tracking pipeline decoupling user redirects from heavy persistence operations to maximize speed.
   * **👤 User Tracking:** Monitor granular link usage, tracking individual clicks associated with authenticated users.
   * **🔒 User Authentication:** Secure login and signup functionality powered by JWT for a personalized and private link management experience.
   * **✨ Modern UI:** A smooth, reactive frontend built with ReactJS for an excellent user experience.
@@ -37,6 +37,7 @@ LinkForge is a full-stack application leveraging modern, industry-standard techn
 | Technology | Purpose |
 | :--- | :--- |
 | **Java 21 & Spring Boot** | Core framework for the RESTful API, providing speed and stability. |
+| **Spring @Async** | Dedicated `ThreadPoolTaskExecutor` for fire-and-forget asynchronous background analytics persistence. |
 | **Spring Security** | Handling authorization, user authentication, and securing endpoints. |
 | **JWT Authentication** | Secure, stateless authentication for API communication. |
 | **PostgreSQL** | Relational database for persistence of short links, long URLs, user data, and click analytics. |

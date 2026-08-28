@@ -20,6 +20,10 @@ spring:
 server:
   port: ${PORT:9090}
 
+spring.redis:
+  host: ${REDIS_HOST:localhost}
+  port: ${REDIS_PORT:6379}
+
 jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION:172800000}
