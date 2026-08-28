@@ -1,6 +1,6 @@
-# 🔗 UrlShortener: Real-Time URL Shortening and Analytics Platform
+# 🔗 LinkForge: Intelligent URL Management Platform
 
-**UrlShortener** is a powerful, modern URL shortening service that allows users to instantly generate short links, securely manage them, and track comprehensive real-time analytics. Built with a robust Spring Boot backend and a responsive React frontend, UrlShortener is designed to be fast, scalable, and user-friendly.
+**LinkForge** is a powerful, modern URL shortening service that allows users to instantly generate short links, securely manage them, and track comprehensive real-time analytics. Built with a robust Java 21 Spring Boot backend and a responsive React frontend, LinkForge is designed to be fast, scalable, and user-friendly.
 
 ## 📚 Table of Contents
 
@@ -15,92 +15,84 @@
 
 ## Overview
 
-UrlShortener provides a complete solution for link management. Beyond just shortening long URLs, it offers detailed, real-time insights into link usage, including the total number of clicks and individual user interactions. The platform ensures a personalized and secure experience through full user authentication and a modern, fast user interface.
+LinkForge provides a complete solution for link management. Beyond just shortening long URLs, it offers detailed, real-time insights into link usage, including the total number of clicks and individual user interactions. The platform ensures a personalized and secure experience through full user authentication and a modern, fast user interface.
 
 ## Key Features
 
   * **✅ Shorten Links:** Instantly generate concise, shareable short URLs for any long link.
+  * **🏷️ Custom URL Aliases:** Optionally create your own custom vanity URL aliases (e.g. `linkforge.com/s/my-brand`).
+  * **⏳ Link Expiration:** Set an optional expiration date for temporary links. Expired links safely return a `410 Gone` while preserving historical click analytics.
   * **📈 Analytics Dashboard:** Access a powerful dashboard to track the performance of every link, showing the total number of clicks.
   * **👤 User Tracking:** Monitor granular link usage, tracking individual clicks associated with authenticated users.
   * **🔒 User Authentication:** Secure login and signup functionality powered by JWT for a personalized and private link management experience.
   * **✨ Modern UI:** A smooth, reactive frontend built with ReactJS for an excellent user experience.
-  * **🚀 Fast & Scalable:** A robust and efficient backend powered by Spring Boot ensures high performance and scalability.
+  * **🚀 Fast & Scalable:** A robust and efficient backend powered by Spring Boot (Java 21) ensures high performance and scalability.
 
 ## Tech Stack
 
-UrlShortener is a full-stack application leveraging modern, industry-standard technologies:
+LinkForge is a full-stack application leveraging modern, industry-standard technologies:
 
 ### Backend (API)
 
 | Technology | Purpose |
 | :--- | :--- |
-| **Spring Boot** | Core framework for the RESTful API, providing speed and stability. |
+| **Java 21 & Spring Boot** | Core framework for the RESTful API, providing speed and stability. |
 | **Spring Security** | Handling authorization, user authentication, and securing endpoints. |
 | **JWT Authentication** | Secure, stateless authentication for API communication. |
-| **MySQL/PostgreSQL** | Relational database for persistence of short links, long URLs, user data, and click analytics. |
+| **PostgreSQL** | Relational database for persistence of short links, long URLs, user data, and click analytics. |
 
 ### Frontend (UI)
 
 | Technology | Purpose |
 | :--- | :--- |
-| **ReactJS** | Library for building the responsive and dynamic Single Page Application (SPA). |
+| **ReactJS (Vite)** | Library for building the responsive and dynamic Single Page Application (SPA). |
 | **React Router** | Managing client-side routing and navigation within the application. |
 | **Axios** | Efficient, promise-based HTTP client for communicating with the Spring Boot API. |
 
-### DevOps
-
-| Technology                      | Purpose                                                                                                                                     |
-| :------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Docker**                      | Containerization platform to package applications with all dependencies, ensuring consistency across environments.                          |
-| **Docker Compose**              | Tool for defining and managing multi-container Docker applications using a single configuration file.                                       |
-| **Kubernetes (K8s)**            | Container orchestration platform for automated deployment, scaling, and management of containerized applications.                           |
-| **Jenkins**                     | Continuous Integration and Continuous Deployment (CI/CD) automation server for building, testing, and deploying applications.               |
-| **Terraform**                   | Infrastructure as Code (IaC) tool for provisioning and managing cloud resources in a consistent and automated way.                          |
-| **Ansible**                     | Configuration management and automation tool for provisioning servers and deploying applications efficiently.                               |
-| **Prometheus**                  | Monitoring and alerting toolkit designed for collecting and querying time-series metrics from applications and infrastructure.              |
-| **Grafana**                     | Visualization and analytics platform used to create dashboards and monitor metrics collected by Prometheus and other sources.               |
-| **Google Cloud Platform (GCP)** | Cloud service provider used for hosting, scaling, and managing applications and infrastructure.                                             |
-| **Render**                      | Cloud platform for hosting and deploying web applications and services with automated builds and scalability.                               |
-| **Vercel**                      | Frontend deployment platform optimized for React and other JavaScript frameworks, enabling fast global delivery and easy CI/CD integration. |
-
-
 ## Getting Started
 
-Follow these steps to set up and run UrlShortener locally.
+Follow these steps to set up and run LinkForge locally.
 
 ### Prerequisites
 
-  * Java Development Kit (JDK 17 or newer)
+  * Java Development Kit (JDK 21)
   * Node.js and npm (or yarn)
-  * A running instance of MySQL or PostgreSQL database.
+  * A running instance of PostgreSQL database.
   * Maven (for Spring Boot build)
 
-### 1\. Database Setup
+### 1\. Database & Environment Setup
 
-1.  Update the database connection properties in the backend's `application.properties` file with your credentials:
-    ```yaml
-    spring.datasource.url: jdbc:postgresql://localhost:5432/urlshortener_db
-    spring.datasource.username: your_db_user
-    spring.datasource.password: your_db_password
-    ```
+1. Copy the example environment file in the backend directory:
+   ```bash
+   cd Url-Shortner-sb
+   cp .env.example .env
+   ```
+2. Update the `.env` file with your actual database credentials and JWT secrets:
+   ```env
+   DB_URL=jdbc:postgresql://localhost:5432/linkforge
+   DB_USERNAME=your_db_user
+   DB_PASSWORD=your_db_password
+   JWT_SECRET=your_super_secret_jwt_key
+   JWT_EXPIRATION_MS=86400000
+   FRONTEND_URL=http://localhost:5173
+   ```
 
 ### 2\. Backend Setup
 
-1.  Navigate to the `backend` directory (or equivalent).
+1.  Navigate to the `Url-Shortner-sb` directory.
 2.  Build the project using Maven:
     ```bash
-    mvn clean install
+    ./mvnw clean install
     ```
 3.  Run the application:
     ```bash
-    java -jar target/urlshortener-backend-*.jar
-    # OR if using an IDE like IntelliJ, run the main application class.
+    ./mvnw spring-boot:run
     ```
     The API should start running on `http://localhost:9090`.
 
 ### 3\. Frontend Setup
 
-1.  Navigate to the `frontend` directory (or equivalent).
+1.  Navigate to the `Url-Shortner-Frontend` directory.
 2.  Install the dependencies:
     ```bash
     npm install
@@ -109,7 +101,7 @@ Follow these steps to set up and run UrlShortener locally.
     ```bash
     npm run dev
     ```
-    The React application should open in your browser at `http://localhost:5173` (or the configured port).
+    The React application should open in your browser at `http://localhost:5173`.
 
 ## Screenshots
   ![alt text](<Images/Login.png>)  
@@ -120,7 +112,7 @@ Follow these steps to set up and run UrlShortener locally.
 
 ## Contribution
 
-We welcome contributions\! If you have suggestions for new features, bug fixes, or improvements, please:
+We welcome contributions! If you have suggestions for new features, bug fixes, or improvements, please:
 
 1.  Fork the repository.
 2.  Create a new feature branch (`git checkout -b feature/amazing-feature`).
@@ -134,6 +126,4 @@ This project is licensed under the **MIT License** – see the [LICENSE](./LICEN
 
 ## Author
 
-Abhishek Rajput
-
-
+Ganesh

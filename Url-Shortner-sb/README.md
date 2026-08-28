@@ -94,9 +94,12 @@ Authorization: Bearer <JWT_TOKEN>
 
 ```json
 {
-  "originalUrl": "https://example.com/long-page"
+  "originalUrl": "https://example.com/long-page",
+  "customAlias": "my-promo",
+  "expiresAt": "2026-10-01T12:00:00.000Z"
 }
 ```
+*(Note: `customAlias` and `expiresAt` are optional)*
 
 ---
 
