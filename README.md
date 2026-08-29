@@ -20,6 +20,7 @@ LinkForge provides a complete solution for link management. Beyond just shorteni
 ## Key Features
 
   * **✅ Shorten Links:** Instantly generate concise, shareable short URLs for any long link.
+  * **📷 QR Code Generation:** Generate and download QR codes for every shortened URL to easily share them offline.
   * **🏷️ Custom URL Aliases:** Optionally create your own custom vanity URL aliases (e.g. `linkforge.com/s/my-brand`).
   * **⏳ Link Expiration:** Set an optional expiration date for temporary links. Expired links safely return a `410 Gone` while preserving historical click analytics.
   * **📈 Async Analytics:** A high-throughput, non-blocking click tracking pipeline decoupling user redirects from heavy persistence operations to maximize speed.

@@ -16,6 +16,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useStoreContext } from "../../contextApi/ContextApi";
 import { Hourglass } from "react-loader-spinner";
 import Graph from "./Graph";
+import { BsQrCode } from "react-icons/bs";
+import QrCodeModal from "./QrCodeModal";
 
 const ShortenItem = ({
   originalUrl,
@@ -33,6 +35,7 @@ const ShortenItem = ({
   const [loader, setLoader] = useState(false);
   const [selectedUrl, setSelectedUrl] = useState("");
   const [analyticsData, setAnalyticsData] = useState([]);
+  const [qrModalOpen, setQrModalOpen] = useState(false);
 
   // --- Editable URL State ---
   const [editing, setEditing] = useState(false);
@@ -233,6 +236,15 @@ const ShortenItem = ({
             </div>
           </CopyToClipboard>
 
+          {/* QR Button */}
+          <div
+            onClick={() => setQrModalOpen(true)}
+            className="flex cursor-pointer gap-1 items-center bg-indigo-600 py-2 font-semibold shadow-md shadow-slate-500 px-6 rounded-md text-white hover:bg-indigo-700 transition-colors"
+          >
+            <button>QR</button>
+            <BsQrCode className="text-md" />
+          </div>
+
           {/* Analytics Button */}
           <div
             onClick={() => analyticsHandler(shortUrl)}
@@ -291,6 +303,13 @@ const ShortenItem = ({
           )}
         </div>
       </React.Fragment>
+
+      <QrCodeModal 
+        open={qrModalOpen} 
+        setOpen={setQrModalOpen} 
+        url={`${import.meta.env.VITE_REACT_FRONT_END_URL}/s/${shortUrl}`} 
+        shortUrl={shortUrl} 
+      />
     </div>
   );
 };
