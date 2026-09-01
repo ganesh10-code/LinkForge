@@ -1,4 +1,3 @@
-
 const TextField = ({
   label,
   id,
@@ -12,11 +11,13 @@ const TextField = ({
   value,
   placeholder,
 }) => {
+  const hasError = errors[id]?.message;
+
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1.5 w-full">
       <label
         htmlFor={id}
-        className={`${className ? className : ""} font-semibold text-md  `}
+        className={`${className ? className : ""} text-sm font-medium text-textMain`}
       >
         {label}
       </label>
@@ -25,36 +26,35 @@ const TextField = ({
         type={type}
         id={id}
         placeholder={placeholder}
-        className={`${
-          className ? className : ""
-        } px-2 py-2 border   outline-none bg-transparent  text-slate-700 rounded-md ${
-          errors[id]?.message ? "border-red-500" : "border-slate-600"
-        }`}
+        className={`w-full px-3 py-2.5 border bg-white text-textMain rounded-lg transition-colors duration-200 placeholder-textSecondary focus:outline-none focus:ring-2 focus:ring-offset-1 ${
+          hasError 
+            ? "border-error focus:ring-error/20 focus:border-error" 
+            : "border-borderColor focus:ring-accent/20 focus:border-accent hover:border-slate-300"
+        } ${className ? className : ""}`}
         {...register(id, {
           required: { value: required, message },
           minLength: min
-            ? { value: min, message: "Minimum 6 character is required" }
+            ? { value: min, message: "Minimum 6 characters required" }
             : null,
-
           pattern:
             type === "email"
               ? {
-                  value: /^[a-zA-Z0-9]+@(?:[a-zA-Z0-9]+\.)+com+$/,
+                  value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
                   message: "Invalid email",
                 }
               : type === "url"
               ? {
                   value:
                     /^(https?:\/\/)?(([a-zA-Z0-9\u00a1-\uffff-]+\.)+[a-zA-Z\u00a1-\uffff]{2,})(:\d{2,5})?(\/[^\s]*)?$/,
-                  message: "Please enter a valid url",
+                  message: "Please enter a valid URL",
                 }
               : null,
         })}
       />
 
-      {errors[id]?.message && (
-        <p className="text-sm font-semibold text-red-600 mt-0">
-          {errors[id]?.message}*
+      {hasError && (
+        <p className="text-sm font-medium text-error mt-1 flex items-center gap-1">
+          {errors[id]?.message}
         </p>
       )}
     </div>

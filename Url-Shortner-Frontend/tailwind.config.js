@@ -1,37 +1,28 @@
-
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      backgroundImage: {
-        "custom-gradient": "linear-gradient(to right, #140b6cff, #77a3efff)", 
-        "custom-gradient-footer": "linear-gradient(to right, #140b6cff, #77a3efff, #140b6cff)", 
-        "custom-gradient-navbar": "linear-gradient(to right, #ffffffff, #ffffffff)", 
-        "custom-gradient-2": "linear-gradient(to left, #3b82f6, #f43f5e)",
-        "card-gradient": "linear-gradient(to right, #38b2ac, #4299e1)",
-      },
       colors: {
-        navbarColor: "#ffffff",
-        btnColor: "#3364F7",
-        linkColor: "#2a5bd7",
-      },
-      boxShadow: {
-        custom: "0 0 15px rgba(0, 0, 0, 0.3)",
-        right: "10px 0px 10px -5px rgba(0, 0, 0, 0.3)",
+        primary: "#0B1220", // Navy
+        accent: "#4F46E5", // Indigo
+        accentBlue: "#2563EB", // Blue
+        bgColor: "#F8FAFC", // Light BG
+        surface: "#FFFFFF",
+        textMain: "#0F172A",
+        textSecondary: "#64748B",
+        borderColor: "#E2E8F0",
+        success: "#16A34A",
+        error: "#DC2626",
       },
       fontFamily: {
-        roboto: ["Roboto", "sans-serif"],
-        montserrat: ["Montserrat"],
+        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
       },
+      boxShadow: {
+        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+        'card': '0 0 0 1px rgba(0,0,0,.05), 0 2px 4px rgba(0,0,0,.02)',
+      }
     },
   },
-
-  variants: {
-    extend: {
-      backgroundImage: ["responsive"],
-    },
-  },
-
   plugins: [],
 };

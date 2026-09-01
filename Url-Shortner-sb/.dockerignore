@@ -1,0 +1,10 @@
+target/
+.git/
+.gitignore
+.env
+.env.example
+docker-compose.yaml
+README.md
+*.log
+.mvn/
+Shortify.postman_collection.json

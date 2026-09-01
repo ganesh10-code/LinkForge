@@ -1,41 +1,29 @@
 import React from "react";
-import {
-  FaFacebook,
-  FaTwitter,
-  FaInstagram,
-  FaLinkedin,
-  FaGithub,
-} from "react-icons/fa";
+
 
 const Footer = () => {
   return (
-    <footer className="bg-custom-gradient-footer text-white py-8 z-40 relative">
-      <div className="container mx-auto px-6 lg:px-14 flex flex-col lg:flex-row lg:justify-between items-center gap-4">
-        <div className="text-center lg:text-left">
-          <h2 className="text-3xl font-bold mb-2">Shortify</h2>
-          <p>Simplifying URL shortening for efficient sharing</p>
-          <p className="text-sm">&copy; 2025 Shortify. All rights reserved.</p>
+    <footer className="bg-white border-t border-borderColor py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex flex-col items-center md:items-start">
+            <span className="font-bold text-xl text-primary tracking-tight mb-2">
+              LinkForge
+            </span>
+            <p className="text-sm text-textSecondary text-center md:text-left">
+              Turn long URLs into simple, memorable links.
+            </p>
+          </div>
         </div>
-
-        <div className="flex space-x-6 mt-4 lg:mt-0">
-          {/* <a href="#" className="hover:text-gray-200">
-            <FaFacebook size={24} />
-          </a>
-          <a href="#" className="hover:text-gray-200">
-            <FaTwitter size={24} />
-          </a> */}
-          <a
-            href="https://github.com/Abhishek-2502"
-            className="hover:text-gray-200"
-          >
-            <FaGithub size={24} />
-          </a>
-          <a
-            href="https://www.linkedin.com/in/abhishek--rajput"
-            className="hover:text-gray-200"
-          >
-            <FaLinkedin size={24} />
-          </a>
+        
+        <div className="mt-8 pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-textSecondary text-center">
+            &copy; {new Date().getFullYear()} All rights reserved.
+          </p>
+          <div className="flex gap-6 text-sm text-textSecondary">
+            <a href="#" className="hover:text-textMain transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-textMain transition-colors">Terms of Service</a>
+          </div>
         </div>
       </div>
     </footer>

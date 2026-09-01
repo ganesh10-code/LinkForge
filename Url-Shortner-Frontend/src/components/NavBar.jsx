@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { IoIosMenu } from "react-icons/io";
 import { RxCross2 } from "react-icons/rx";
 import { useStoreContext } from "../contextApi/ContextApi";
+import { FaLink } from "react-icons/fa6";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -16,80 +17,74 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  const navLinkStyle = (isActive) =>
+    `text-sm font-medium transition-colors ${
+      isActive ? "text-accent" : "text-textSecondary hover:text-textMain"
+    }`;
+
   return (
-    <div className="sticky top-0 z-50">
-      {/* --- Top Navbar Row --- */}
-      <div className="h-16 bg-custom-gradient-navbar flex items-center">
-        <div className="lg:px-14 sm:px-8 px-4 w-full flex justify-between">
+    <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-borderColor">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16 items-center">
+          
           {/* Logo */}
-          <Link to="/">
-            <h1 className="font-bold text-3xl text-black italic sm:mt-0 mt-2">
-              Shortify
-            </h1>
+          <Link to="/" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white transition-transform group-hover:scale-105">
+              <FaLink className="text-sm" />
+            </div>
+            <span className="font-bold text-xl text-primary tracking-tight">
+              LinkForge
+            </span>
           </Link>
 
           {/* Desktop Menu */}
-          <ul className="hidden sm:flex gap-10 items-center text-slate-800">
-            <li>
-              <Link
-                className={`${
-                  path === "/" ? "text-black font-semibold" : "text-gray-600"
-                }`}
-                to="/"
-              >
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                className={`${
-                  path === "/about" ? "text-black font-semibold" : "text-gray-600"
-                }`}
-                to="/about"
-              >
-                About
-              </Link>
-            </li>
-            {token && (
-              <li>
-                <Link
-                  className={`${
-                    path === "/dashboard"
-                      ? "text-black font-semibold"
-                      : "text-gray-600"
-                  }`}
-                  to="/dashboard"
-                >
+          <nav className="hidden sm:flex items-center gap-8">
+            <Link className={navLinkStyle(path === "/")} to="/">
+              Home
+            </Link>
+            <Link className={navLinkStyle(path === "/about")} to="/about">
+              About
+            </Link>
+            
+            {token ? (
+              <>
+                <Link className={navLinkStyle(path === "/dashboard")} to="/dashboard">
                   Dashboard
                 </Link>
-              </li>
+                <div className="h-4 w-px bg-slate-200"></div>
+                <button
+                  onClick={onLogOutHandler}
+                  className="text-sm font-medium text-textSecondary hover:text-textMain transition-colors"
+                >
+                  Log Out
+                </button>
+              </>
+            ) : (
+              <div className="flex items-center gap-4 ml-4">
+                <Link
+                  to="/login"
+                  className="text-sm font-medium text-textSecondary hover:text-textMain transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link to="/register">
+                  <button className="bg-primary text-white text-sm px-4 py-2 rounded-lg font-medium hover:bg-slate-800 transition-colors shadow-soft">
+                    Sign Up
+                  </button>
+                </Link>
+              </div>
             )}
-            {!token && (
-              <Link to="/register">
-                <li className="bg-custom-gradient text-white cursor-pointer w-24 text-center font-semibold px-2 py-2 rounded-md hover:text-slate-300 transition-all duration-150">
-                  Sign Up
-                </li>
-              </Link>
-            )}
-            {token && (
-              <button
-                onClick={onLogOutHandler}
-                className="bg-rose-700 text-white cursor-pointer w-24 text-center font-semibold px-2 py-2 rounded-md hover:text-slate-300 transition-all duration-150"
-              >
-                Log Out
-              </button>
-            )}
-          </ul>
+          </nav>
 
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setNavbarOpen(!navbarOpen)}
-            className="sm:hidden flex items-center"
+            className="sm:hidden p-2 rounded-md text-textSecondary hover:bg-slate-100 transition-colors"
           >
             {navbarOpen ? (
-              <RxCross2 className="text-black text-3xl" />
+              <RxCross2 className="text-2xl" />
             ) : (
-              <IoIosMenu className="text-black text-3xl" />
+              <IoIosMenu className="text-2xl" />
             )}
           </button>
         </div>
@@ -97,16 +92,15 @@ const Navbar = () => {
 
       {/* --- Mobile Dropdown --- */}
       <div
-        className={`sm:hidden transition-all duration-300 overflow-hidden ${
-          navbarOpen ? "max-h-96" : "max-h-0"
+        className={`sm:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+          navbarOpen ? "max-h-64 border-b border-borderColor bg-white" : "max-h-0"
         }`}
       >
-        <ul className="flex flex-col gap-4 px-4 py-4 bg-custom-gradient shadow-md">
+        <ul className="px-4 py-4 space-y-4">
           <li>
             <Link
-              className={`${
-                path === "/" ? "text-white font-semibold" : "text-gray-300"
-              }`}
+              onClick={() => setNavbarOpen(false)}
+              className={`block w-full ${navLinkStyle(path === "/")}`}
               to="/"
             >
               Home
@@ -114,42 +108,51 @@ const Navbar = () => {
           </li>
           <li>
             <Link
-              className={`${
-                path === "/about" ? "text-white font-semibold" : "text-gray-300"
-              }`}
+              onClick={() => setNavbarOpen(false)}
+              className={`block w-full ${navLinkStyle(path === "/about")}`}
               to="/about"
             >
               About
             </Link>
           </li>
-          {token && (
-            <li>
+          {token ? (
+            <>
+              <li>
+                <Link
+                  onClick={() => setNavbarOpen(false)}
+                  className={`block w-full ${navLinkStyle(path === "/dashboard")}`}
+                  to="/dashboard"
+                >
+                  Dashboard
+                </Link>
+              </li>
+              <li className="pt-2 border-t border-slate-100">
+                <button
+                  onClick={() => {
+                    setNavbarOpen(false);
+                    onLogOutHandler();
+                  }}
+                  className="block w-full text-left text-sm font-medium text-textSecondary hover:text-textMain"
+                >
+                  Log Out
+                </button>
+              </li>
+            </>
+          ) : (
+            <li className="pt-2 flex flex-col gap-3 border-t border-slate-100">
               <Link
-                className={`${
-                  path === "/dashboard"
-                    ? "text-white font-semibold"
-                    : "text-gray-300"
-                }`}
-                to="/dashboard"
+                onClick={() => setNavbarOpen(false)}
+                to="/login"
+                className="text-center text-sm font-medium text-textSecondary hover:text-textMain transition-colors py-2"
               >
-                Dashboard
+                Sign In
+              </Link>
+              <Link onClick={() => setNavbarOpen(false)} to="/register">
+                <button className="w-full bg-primary text-white text-sm px-4 py-2.5 rounded-lg font-medium hover:bg-slate-800 transition-colors">
+                  Sign Up
+                </button>
               </Link>
             </li>
-          )}
-          {!token && (
-            <Link to="/register">
-              <li className="bg-custom-gradient text-white cursor-pointer w-24 text-center font-semibold px-2 py-2 rounded-md hover:text-slate-300 transition-all duration-150">
-                Sign Up
-              </li>
-            </Link>
-          )}
-          {token && (
-            <button
-              onClick={onLogOutHandler}
-              className="bg-rose-700 text-white cursor-pointer w-24 text-center font-semibold px-2 py-2 rounded-md hover:text-slate-300 transition-all duration-150"
-            >
-              Log Out
-            </button>
           )}
         </ul>
       </div>
@@ -158,3 +161,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

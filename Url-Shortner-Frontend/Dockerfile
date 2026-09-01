@@ -1,17 +1,33 @@
-FROM node:18-alpine
+# Stage 1: Build the React application
+FROM node:18-alpine AS build
+
 WORKDIR /app
 
+# Accept build arguments (None currently required)
+
+# Set environment variables for the build
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
+# Install dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm ci
+
+# Copy the rest of the application and build
 COPY . .
 RUN npm run build
-RUN npm install -g serve
 
-EXPOSE 5173
-CMD ["serve", "-s", "dist", "-l", "5173"]
+# Stage 2: Serve the application using Nginx
+FROM nginx:alpine
 
-# Build image
-# docker build -t shortify-frontend .
+# Install curl for healthcheck
+RUN apk add --no-cache curl
 
-# Run container (map 5173 inside container -> 5173 on host)
-# docker run -it -p 5173:5173 --name shortify-frontend-container shortify-frontend
+# Copy the Nginx configuration file
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy the built React app from the build stage to Nginx's web root
+COPY --from=build /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

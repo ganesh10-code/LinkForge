@@ -11,6 +11,16 @@ export default defineConfig({
     watch: {
       usePolling: true // needed for hot reload in Docker sometimes
     },
-    allowedHosts: ['.localhost', 'url-shortener-beige-phi.vercel.app', 'urlshortener-frontend-x13q.onrender.com','shortifyreac.netlify.app/'] 
+    allowedHosts: ['.localhost', 'url-shortener-beige-phi.vercel.app', 'urlshortener-frontend-x13q.onrender.com','shortifyreac.netlify.app/'],
+    proxy: {
+      '/api': {
+        target: 'http://localhost:9090',
+        changeOrigin: true,
+      },
+      '/s/': {
+        target: 'http://localhost:9090',
+        changeOrigin: true,
+      }
+    }
   }
 })

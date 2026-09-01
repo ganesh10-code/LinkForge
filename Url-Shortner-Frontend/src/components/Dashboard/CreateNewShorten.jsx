@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useStoreContext } from "../../contextApi/ContextApi";
 import { useForm } from "react-hook-form";
-import { data } from "autoprefixer";
 import TextField from "../TextField";
 import { Tooltip } from "@mui/material";
 import { RxCross2 } from "react-icons/rx";
@@ -44,12 +43,11 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
       });
 
       const shortenUrl = `${
-        import.meta.env.VITE_REACT_FRONT_END_URL + "/s/" + `${res.shortUrl}`
+        `${window.location.origin}/s/${res.shortUrl}`
       }`;
       navigator.clipboard.writeText(shortenUrl).then(() => {
-        toast.success("Short URL Copied to Clipboard", {
+        toast.success("Short URL created and copied to clipboard!", {
           position: "bottom-center",
-          className: "mb-5",
           duration: 3000,
         });
       });
@@ -59,7 +57,7 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
       reset();
       setOpen(false);
     } catch (error) {
-      const errorMessage = error.response?.data?.error || "Create ShortURL Failed";
+      const errorMessage = error.response?.data?.error || "Failed to create short link.";
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -67,66 +65,86 @@ const CreateNewShorten = ({ setOpen, refetch }) => {
   };
 
   return (
-    <div className=" flex justify-center items-center bg-white rounded-md">
+    <div className="flex justify-center items-center bg-transparent rounded-lg">
       <form
         onSubmit={handleSubmit(createShortUrlHandler)}
-        className="sm:w-[450px] w-[360px] relative  shadow-custom pt-8 pb-5 sm:px-8 px-4 rounded-lg"
+        className="w-[90vw] sm:w-[480px] relative bg-white border border-borderColor shadow-xl p-8 rounded-2xl"
       >
-        <h1 className="font-montserrat sm:mt-0 mt-3 text-center  font-bold sm:text-2xl text-[22px] text-slate-800 ">
-          Create New Shorten Url
-        </h1>
-
-        <hr className="mt-2 sm:mb-5 mb-3 text-slate-950" />
-
-        <div>
-          <TextField
-            label="Enter URL"
-            required
-            id="originalUrl"
-            placeholder="https://example.com"
-            type="url"
-            message="Url is required"
-            register={register}
-            errors={errors}
-          />
-        </div>
-        
-        <div className="mt-2">
-          <TextField
-            label="Custom Alias (optional)"
-            id="customAlias"
-            placeholder="my-link"
-            type="text"
-            register={register}
-            errors={errors}
-          />
+        <div className="mb-6">
+          <h1 className="font-bold text-2xl text-textMain">
+            Create new link
+          </h1>
+          <p className="text-sm text-textSecondary mt-1">
+            Turn your long URL into a short, manageable link.
+          </p>
         </div>
 
-        <div className="mt-2">
-          <TextField
-            label="Expiration (optional)"
-            id="expiresAt"
-            type="datetime-local"
-            register={register}
-            errors={errors}
-          />
+        <div className="space-y-4">
+          <div>
+            <TextField
+              label="Destination URL"
+              required
+              id="originalUrl"
+              placeholder="https://example.com/very/long/url"
+              type="url"
+              message="URL is required"
+              register={register}
+              errors={errors}
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 gap-4">
+            <TextField
+              label="Custom Alias (optional)"
+              id="customAlias"
+              placeholder="e.g. my-campaign"
+              type="text"
+              register={register}
+              errors={errors}
+            />
+
+            <TextField
+              label="Expiration Date (optional)"
+              id="expiresAt"
+              type="datetime-local"
+              register={register}
+              errors={errors}
+            />
+          </div>
         </div>
 
-        <button
-          className="bg-customRed font-semibold text-white w-32  bg-custom-gradient  py-2  transition-colors  rounded-md my-3"
-          type="text"
-        >
-          {loading ? "Loading..." : "Create"}
-        </button>
+        <div className="flex justify-end gap-3 mt-8">
+          <button
+            type="button"
+            className="px-5 py-2.5 bg-white border border-borderColor text-textMain font-medium rounded-lg hover:bg-slate-50 transition-colors shadow-sm"
+            onClick={() => setOpen(false)}
+          >
+            Cancel
+          </button>
+          <button
+            className="px-5 py-2.5 bg-accent text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+            type="submit"
+            disabled={loading}
+          >
+            {loading && (
+              <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            )}
+            {loading ? "Creating..." : "Create Link"}
+          </button>
+        </div>
 
         {!loading && (
           <Tooltip title="Close">
             <button
+              type="button"
               disabled={loading}
               onClick={() => setOpen(false)}
-              className=" absolute right-2 top-2  "
+              className="absolute right-4 top-4 w-8 h-8 flex items-center justify-center rounded-full text-textSecondary hover:bg-slate-100 hover:text-textMain transition-colors"
             >
-              <RxCross2 className="text-slate-800   text-3xl" />
+              <RxCross2 className="text-xl" />
             </button>
           </Tooltip>
         )}

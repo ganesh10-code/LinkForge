@@ -37,12 +37,13 @@ const Graph = ({ graphData }) => {
             ? userPerDaya
             : [1, 2, 3, 4, 5, 6, 7, 6, 5, 4, 3, 2, 1],
         backgroundColor:
-         graphData.length > 0 ? "#3b82f6" : "rgba(54, 162, 235, 0.1)",
-        borderColor: "#1D2327",
-        pointBorderColor: "red",
+         graphData.length > 0 ? "#2563EB" : "rgba(37, 99, 235, 0.1)",
+        borderColor: "transparent",
+        pointBorderColor: "transparent",
         fill: true,
         tension: 0.4,
-        barThickness: 20,
+        barThickness: 24,
+        borderRadius: 4,
         categoryPercentage: 1.5,
         barPercentage: 1.5,
       },
@@ -54,11 +55,23 @@ const Graph = ({ graphData }) => {
     responsive: true,
     plugins: {
       legend: {
-        display: true,
+        display: false,
       },
+      tooltip: {
+        backgroundColor: '#1E293B',
+        padding: 12,
+        titleFont: { size: 14, family: 'Inter' },
+        bodyFont: { size: 13, family: 'Inter' },
+        cornerRadius: 6,
+      }
     },
     scales: {
       y: {
+        border: { dash: [4, 4] },
+        grid: {
+          color: '#E2E8F0',
+          drawBorder: false,
+        },
         beginAtZero: true,
         ticks: {
           // stepSize: 1,
@@ -71,29 +84,30 @@ const Graph = ({ graphData }) => {
         },
         title: {
           display: true,
-          text: "Number Of Clicks",
+          text: "Number of Clicks",
           font: {
-            family: "Arial",
-            size: 16,
-            weight: "bold",
-            color: "#FF0000",
+            family: "Inter, sans-serif",
+            size: 13,
+            weight: "500",
           },
+          color: "#64748B",
         },
       },
       x: {
+        grid: {
+          display: false,
+          drawBorder: false,
+        },
         beginAtZero: true,
-        // ticks: {
-        //   stepSize: 1,
-        // },
         title: {
           display: true,
           text: "Date",
           font: {
-            family: "Arial",
-            size: 16,
-            weight: "bold",
-            color: "#FF0000",
+            family: "Inter, sans-serif",
+            size: 13,
+            weight: "500",
           },
+          color: "#64748B",
         },
       },
     },

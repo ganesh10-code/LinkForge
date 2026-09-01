@@ -23,7 +23,7 @@ public class RedirectController {
     /**
      * Redirect to original URL
      */
-    @GetMapping("/{shortUrl}")
+    @GetMapping("/s/{shortUrl}")
     public ResponseEntity<Void> redirect(@PathVariable @NotBlank(message = "Short URL cannot be blank") String shortUrl) {
         String originalUrl = urlMappingService.getOriginalUrl(shortUrl);
         if (originalUrl != null) {

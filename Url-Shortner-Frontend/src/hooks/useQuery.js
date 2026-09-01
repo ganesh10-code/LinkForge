@@ -1,6 +1,7 @@
 
 import { useQuery } from "react-query"
 import api from "../apis/api"
+import dayjs from "dayjs"
 
 
 export const useFetchMyShortUrls = (token, onError) => {
@@ -33,8 +34,10 @@ export const useFetchMyShortUrls = (token, onError) => {
 export const useFetchTotalClicks = (token, onError) => {
     return useQuery("url-totalclick",
          async () => {
+            const endDate = dayjs().format("YYYY-MM-DD");
+            const startDate = dayjs().subtract(30, 'day').format("YYYY-MM-DD");
             return await api.get(
-                "/api/urls/totalClicks?startDate=2024-01-01&endDate=2025-12-31",
+                `/api/urls/totalClicks?startDate=${startDate}&endDate=${endDate}`,
             {
                 headers: {
                     "Content-Type": "application/json",

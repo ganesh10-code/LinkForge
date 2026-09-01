@@ -52,9 +52,9 @@ http://localhost:8081/api/auth/public/register
 
 ```json
 {
-  "username": "abhishek",
-  "email": "abhishek@example.com",
-  "password": "Abhi@123",
+  "username": "johndoe",
+  "email": "johndoe@example.com",
+  "password": "Password@123",
   "role": ["ROLE_USER"]
 }
 ```
@@ -71,8 +71,8 @@ http://localhost:8081/api/auth/public/login
 
 ```json
 {
-  "username": "abhishek",
-  "password": "Abhi@123"
+  "username": "johndoe",
+  "password": "Password@123"
 }
 ```
 

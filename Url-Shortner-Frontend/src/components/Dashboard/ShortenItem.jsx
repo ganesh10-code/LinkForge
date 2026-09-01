@@ -42,7 +42,7 @@ const ShortenItem = ({
   const [newOriginalUrl, setNewOriginalUrl] = useState(originalUrl);
   const [updating, setUpdating] = useState(false);
 
-  const subDomain = import.meta.env.VITE_REACT_FRONT_END_URL.replace(
+  const subDomain = window.location.origin.replace(
     /^https?:\/\//,
     ""
   );
@@ -57,8 +57,11 @@ const ShortenItem = ({
   const fetchMyShortUrl = async () => {
     setLoader(true);
     try {
+      const endDate = dayjs().format("YYYY-MM-DDTHH:mm:ss");
+      const startDate = dayjs().subtract(30, 'day').format("YYYY-MM-DDTHH:mm:ss");
+      
       const { data } = await api.get(
-        `/api/urls/analytics/${selectedUrl}?startDate=2024-12-01T00:00:00&endDate=2025-12-31T23:59:59`,
+        `/api/urls/analytics/${selectedUrl}?startDate=${startDate}&endDate=${endDate}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -69,7 +72,6 @@ const ShortenItem = ({
       );
       setAnalyticsData(data);
       setSelectedUrl("");
-      console.log(data);
     } catch (error) {
       navigate("/error");
       console.log(error);
@@ -124,7 +126,7 @@ const ShortenItem = ({
         },
       });
       toast.success("Short URL deleted successfully!");
-      if (onDelete) onDelete(shortUrl); // notify parent to remove from UI
+      if (onDelete) onDelete(shortUrl); 
     } catch (error) {
       console.error(error);
       toast.error("Failed to delete the short URL");
@@ -134,35 +136,26 @@ const ShortenItem = ({
   const isExpired = expiresAt && dayjs().isAfter(dayjs(expiresAt));
 
   return (
-    <div
-      className={`bg-slate-100 shadow-lg border border-dotted  border-slate-500 px-6 sm:py-1 py-3 rounded-md  transition-all duration-100 `}
-    >
-      <div
-        className={`flex sm:flex-row flex-col  sm:justify-between w-full sm:gap-0 gap-5 py-5 `}
-      >
+    <div className="bg-white border-b border-borderColor last:border-0 hover:bg-slate-50 transition-colors">
+      <div className="flex flex-col lg:flex-row justify-between w-full p-6 gap-6">
+        
         {/* URL Info */}
-        <div className="flex-1 sm:space-y-1 max-w-full overflow-x-auto overflow-y-hidden ">
-          <div className="text-slate-900 pb-1 sm:pb-0   flex items-center gap-2 ">
-            {/* <a href={`${import.meta.env.VITE_REACT_SUBDOMAIN}/${shortUrl}`}
-                target="_blank"
-                className=" text-[17px]  font-montserrat font-[600] text-linkColor ">
-                {subDomain + "/" + `${shortUrl}`}
-            </a> */}
-
+        <div className="flex-1 min-w-0 flex flex-col gap-3">
+          
+          <div className="flex items-center gap-3 flex-wrap">
             <Link
-              target="_"
-              className="text-[17px]  font-montserrat font-[600] text-linkColor"
-              to={
-                import.meta.env.VITE_REACT_FRONT_END_URL + "/s/" + `${shortUrl}`
-              }
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-lg font-semibold text-accent hover:text-indigo-700 transition-colors truncate"
+              to={`${window.location.origin}/s/${shortUrl}`}
             >
-              {subDomain + "/s/" + `${shortUrl}`}
+              {subDomain + "/s/" + shortUrl}
             </Link>
-            <FaExternalLinkAlt className="text-linkColor" />
+            <FaExternalLinkAlt className="text-textSecondary text-xs" />
           </div>
 
           {/* Editable Original URL */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 max-w-full">
             {editing ? (
               <input
                 type="text"
@@ -172,142 +165,131 @@ const ShortenItem = ({
                 onBlur={updateOriginalUrl}
                 disabled={updating}
                 autoFocus
-                className="border px-2 py-1 rounded w-full"
+                className="flex-1 min-w-0 border border-borderColor rounded-md px-3 py-1.5 text-sm text-textMain focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent"
               />
             ) : (
-              <>
-                <h3 className="text-slate-700 font-[400] text-[17px]">
+              <div className="flex items-center gap-2 min-w-0 text-textSecondary text-sm group">
+                <span className="truncate max-w-[300px] sm:max-w-md" title={newOriginalUrl}>
                   {newOriginalUrl}
-                </h3>
-                <FaEdit
-                  className="text-gray-500 cursor-pointer hover:text-blue-500"
+                </span>
+                <button 
                   onClick={() => setEditing(true)}
-                />
-              </>
+                  className="p-1 text-slate-400 hover:text-accent opacity-0 group-hover:opacity-100 transition-all rounded-md hover:bg-slate-100"
+                  title="Edit original URL"
+                >
+                  <FaEdit />
+                </button>
+              </div>
             )}
           </div>
 
-          <div className="flex   items-center gap-8 pt-6 ">
-            <div className="flex gap-1  items-center font-semibold  text-green-800">
-              <span>
-                <MdOutlineAdsClick className="text-[22px] me-1" />
-              </span>
-              <span className="text-[16px]">{clickCount}</span>
-              <span className="text-[15px] ">
-                {clickCount === 0 || clickCount === 1 ? "Click" : "Clicks"}
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-1 text-sm text-textSecondary">
+            <div className="flex items-center gap-1.5 font-medium text-textMain bg-slate-100 px-2 py-1 rounded-md">
+              <MdOutlineAdsClick className="text-lg text-accent" />
+              <span>{clickCount}</span>
+              <span className="font-normal text-textSecondary">
+                {clickCount === 1 ? "click" : "clicks"}
               </span>
             </div>
 
-            <div className="flex items-center gap-2 font-semibold text-lg text-slate-800">
-              <span>
-                <FaRegCalendarAlt />
-              </span>
-              <span className="text-[17px]">
-                {dayjs(createdDate).format("MMM DD, YYYY")}
-              </span>
+            <div className="flex items-center gap-1.5">
+              <FaRegCalendarAlt className="text-slate-400" />
+              <span>{dayjs(createdDate).format("MMM D, YYYY")}</span>
             </div>
 
-            <div className={`flex items-center gap-2 font-semibold text-sm ${isExpired ? 'text-red-600' : 'text-slate-600'}`}>
-              <span className="text-[15px]">
+            <div className={`flex items-center gap-1.5 ${isExpired ? 'text-error font-medium' : ''}`}>
+              <span>
                 {expiresAt
-                  ? (isExpired ? "Expired" : `Expires: ${dayjs(expiresAt).format("MMM DD, YYYY h:mm A")}`)
-                  : "Never expires"}
+                  ? (isExpired ? "Expired" : `Expires ${dayjs(expiresAt).format("MMM D, YYYY")}`)
+                  : "No expiration"}
               </span>
             </div>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex  flex-1 flex-wrap sm:justify-end items-center gap-4">
-          {/* Copy Button */}
+        <div className="flex flex-wrap items-start lg:justify-end gap-2 shrink-0">
           <CopyToClipboard
-            onCopy={() => setIsCopied(true)}
-            text={`${
-              import.meta.env.VITE_REACT_FRONT_END_URL + "/s/" + `${shortUrl}`
-            }`}
+            onCopy={() => {
+              setIsCopied(true);
+              setTimeout(() => setIsCopied(false), 2000);
+            }}
+            text={`${window.location.origin}/s/${shortUrl}`}
           >
-            <div className="flex cursor-pointer gap-1 items-center bg-btnColor py-2  font-semibold shadow-md shadow-slate-500 px-6 rounded-md text-white ">
-              <button className="">{isCopied ? "Copied" : "Copy"}</button>
-              {isCopied ? (
-                <LiaCheckSolid className="text-md" />
-              ) : (
-                <IoCopy className="text-md" />
-              )}
-            </div>
+            <button className="flex items-center gap-2 bg-white border border-borderColor hover:bg-slate-50 hover:border-slate-300 text-textMain px-3 py-2 rounded-lg font-medium transition-all text-sm shadow-sm">
+              {isCopied ? <LiaCheckSolid className="text-success text-lg" /> : <IoCopy className="text-textSecondary text-lg" />}
+              {isCopied ? "Copied!" : "Copy"}
+            </button>
           </CopyToClipboard>
 
-          {/* QR Button */}
-          <div
+          <button
             onClick={() => setQrModalOpen(true)}
-            className="flex cursor-pointer gap-1 items-center bg-indigo-600 py-2 font-semibold shadow-md shadow-slate-500 px-6 rounded-md text-white hover:bg-indigo-700 transition-colors"
+            className="flex items-center gap-2 bg-white border border-borderColor hover:bg-slate-50 hover:border-slate-300 text-textMain px-3 py-2 rounded-lg font-medium transition-all text-sm shadow-sm"
           >
-            <button>QR</button>
-            <BsQrCode className="text-md" />
-          </div>
+            <BsQrCode className="text-textSecondary text-lg" />
+            QR Code
+          </button>
 
-          {/* Analytics Button */}
-          <div
+          <button
             onClick={() => analyticsHandler(shortUrl)}
-            className="flex cursor-pointer gap-1 items-center bg-green-700 py-2 font-semibold shadow-md shadow-slate-500 px-6 rounded-md text-white "
+            className={`flex items-center gap-2 border px-3 py-2 rounded-lg font-medium transition-all text-sm shadow-sm ${
+              analyticToggle 
+                ? 'bg-slate-100 border-slate-300 text-textMain' 
+                : 'bg-white border-borderColor hover:bg-slate-50 hover:border-slate-300 text-textMain'
+            }`}
           >
-            <button>Analytics</button>
-            <MdAnalytics className="text-md" />
-          </div>
+            <MdAnalytics className="text-textSecondary text-lg" />
+            Analytics
+          </button>
 
-          {/* Delete Button */}
-          <div
+          <button
             onClick={deleteHandler}
-            className="flex cursor-pointer gap-1 items-center bg-red-600 py-2 font-semibold shadow-md shadow-slate-500 px-6 rounded-md text-white "
+            className="flex items-center gap-2 bg-white border border-red-200 hover:bg-red-50 text-error px-3 py-2 rounded-lg font-medium transition-all text-sm shadow-sm"
           >
-            <button>Delete</button>
-            <FaTrashAlt className="text-md" />
-          </div>
+            <FaTrashAlt className="text-sm" />
+          </button>
         </div>
       </div>
-      <React.Fragment>
-        <div
-          className={`${
-            analyticToggle ? "flex" : "hidden"
-          }  max-h-96 sm:mt-0 mt-5 min-h-96 relative  border-t-2 w-[100%] overflow-hidden `}
-        >
+      
+      {/* Analytics Dropdown */}
+      <div
+        className={`transition-all duration-300 ease-in-out overflow-hidden border-t border-slate-100 ${
+          analyticToggle ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0 border-transparent"
+        }`}
+      >
+        <div className="p-6 bg-slate-50 h-[400px] relative">
           {loader ? (
-            <div className="min-h-[calc(450px-140px)] flex justify-center items-center w-full">
-              <div className="flex flex-col items-center gap-1">
-                <Hourglass
-                  visible={true}
-                  height="50"
-                  width="50"
-                  ariaLabel="hourglass-loading"
-                  wrapperStyle={{}}
-                  wrapperClass=""
-                  colors={["#306cce", "#72a1ed"]}
-                />
-                <p className="text-slate-700">Please Wait...</p>
-              </div>
+            <div className="absolute inset-0 flex flex-col justify-center items-center">
+              <Hourglass
+                visible={true}
+                height="40"
+                width="40"
+                colors={["#4F46E5", "#818cf8"]}
+              />
+              <p className="text-textSecondary mt-3 text-sm font-medium">Loading analytics...</p>
             </div>
           ) : (
             <>
-              {analyticsData.length === 0 && (
-                <div className="absolute flex flex-col  justify-center sm:items-center items-end  w-full left-0 top-0 bottom-0 right-0 m-auto">
-                  <h1 className=" text-slate-800 font-serif sm:text-2xl text-[15px] font-bold mb-1">
-                    No Data For This Time Period
-                  </h1>
-                  <h3 className="sm:w-96 w-[90%] sm:ml-0 pl-6 text-center sm:text-lg text-[12px] text-slate-600 ">
-                    Share your short link to view where your engagements are
-                    coming from
-                  </h3>
+              {analyticsData.length === 0 ? (
+                <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-4">
+                  <MdAnalytics className="text-slate-300 text-4xl mb-3" />
+                  <h4 className="text-textMain font-medium mb-1">No clicks recorded yet</h4>
+                  <p className="text-textSecondary text-sm max-w-sm">
+                    Share your short link to start tracking engagement metrics.
+                  </p>
                 </div>
+              ) : (
+                <Graph graphData={analyticsData} />
               )}
-              <Graph graphData={analyticsData} />
             </>
           )}
         </div>
-      </React.Fragment>
+      </div>
 
       <QrCodeModal 
         open={qrModalOpen} 
         setOpen={setQrModalOpen} 
-        url={`${import.meta.env.VITE_REACT_FRONT_END_URL}/s/${shortUrl}`} 
+        url={`${window.location.origin}/s/${shortUrl}`} 
         shortUrl={shortUrl} 
       />
     </div>

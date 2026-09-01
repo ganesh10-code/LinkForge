@@ -50,11 +50,12 @@ const QrCodeModal = ({ open, setOpen, url, shortUrl }) => {
       aria-describedby="qr-modal-description"
     >
       <div className="flex justify-center items-center h-full w-full">
-        <div className="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center gap-6 outline-none">
-          <h2 id="qr-modal-title" className="text-2xl font-bold text-slate-800">
-            QR Code
+        <div className="bg-white p-8 rounded-lg shadow-sm border border-slate-200 flex flex-col items-center gap-6 outline-none">
+          <h2 id="qr-modal-title" className="text-xl font-semibold text-slate-900">
+            QR code
           </h2>
-          <div className="p-4 bg-white border-2 border-slate-200 rounded-md">
+          <p className="text-sm text-slate-500 max-w-[256px] text-center truncate">{url}</p>
+          <div className="p-2 bg-white border border-slate-200 rounded-md">
             <QRCodeSVG
               id="qr-code-svg"
               value={url}
@@ -65,9 +66,15 @@ const QrCodeModal = ({ open, setOpen, url, shortUrl }) => {
           </div>
           <button
             onClick={handleDownload}
-            className="bg-btnColor hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-md shadow-md transition-colors w-full"
+            className="bg-primary hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md transition-colors w-full"
           >
-            Download QR
+            Download
+          </button>
+          <button
+            onClick={handleClose}
+            className="text-slate-500 hover:text-slate-700 font-medium text-sm transition-colors"
+          >
+            Close
           </button>
         </div>
       </div>

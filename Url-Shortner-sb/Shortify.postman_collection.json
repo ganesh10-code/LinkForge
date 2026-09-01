@@ -32,7 +32,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"username\": \"abhishek\",\r\n  \"email\": \"abhishek@gmail.com\",\r\n  \"password\": \"Abhi@123\",\r\n  \"role\": [\"ROLE_USER\"]\r\n}",
+					"raw": "{\r\n  \"username\": \"johndoe\",\r\n  \"email\": \"johndoe@example.com\",\r\n  \"password\": \"Password@123\",\r\n  \"role\": [\"ROLE_USER\"]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -63,7 +63,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"username\": \"abhishek\",\r\n  \"password\": \"Abhi@123\"\r\n}",
+					"raw": "{\r\n  \"username\": \"johndoe\",\r\n  \"password\": \"Password@123\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"

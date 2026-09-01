@@ -2,7 +2,7 @@ spring:
   application:
     name: Url-Shortner-sb
   config:
-    import: optional:file:.env[.properties]
+    import: optional:file:.env[.properties], optional:file:../.env[.properties]
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -20,7 +20,7 @@ spring:
 server:
   port: ${PORT:9090}
 
-spring.redis:
+spring.data.redis:
   host: ${REDIS_HOST:localhost}
   port: ${REDIS_PORT:6379}
 
